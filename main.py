@@ -1,12 +1,9 @@
+from config import api_id, api_hash, session_name
 from telethon import TelegramClient
 from draftsbot import DraftBot
 from schedule import Schedule
 from history import History
 import random
-
-api_id = 12345678
-api_hash = "hidden"
-session_name = "userbot"
 
 history = History()
 

@@ -6,7 +6,7 @@ class Schedule:
     def __init__(self, timetable, job, time_scale = 1):
         self.job = job
         self.time_scale = time_scale
-        print(timetable)
+        print(f"Инициализировано расписание: {timetable}")
         self.schedule_minutes = [self.parse_time(t) for t in timetable]
 
     # переводим расписание в минуты с начала суток
