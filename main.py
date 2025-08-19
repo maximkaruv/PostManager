@@ -8,15 +8,13 @@ api_id = 12345678
 api_hash = "hidden"
 session_name = "userbot"
 
-client = TelegramClient(session_name, api_id, api_hash)
 history = History()
 
 class Bundle:
-    def __init__(self, draft_chat, original_chat, timetable):
+    def __init__(self, draft_chat, original_chat, timetable, client):
         self.draft_chat = draft_chat
         self.original_chat = original_chat
         self.timetable = timetable
-        global client
         self.draftbot = DraftBot(client, self.draft_chat)
         self.group = []
     
@@ -48,7 +46,7 @@ class Bundle:
         self.group.remove(random_post)
         await self.draftbot.duplicate_post(self.draft_chat, self.original_chat, random_post.id)
         print(f"Опубликован новый пост в осн.канал: {random_post.id}")
-        history.add(random_post)
+        history.add(random_post.id)
 
     # Запускаем расписание для бандла
     async def run_schedule(self):
@@ -62,10 +60,14 @@ class Bundle:
 
 
 async def main():
+    client = TelegramClient(session_name, api_id, api_hash)
+    await client.start()
+
     drafts = Bundle(
         draft_chat="https://t.me/draft_group",
         original_chat="https://t.me/original_group2",
-        timetable=["3:00", "7:00", "22:00"]
+        timetable=["3:00", "7:00", "22:00"],
+        client=client
     )
     await drafts.run_schedule()
 

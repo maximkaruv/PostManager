@@ -30,7 +30,7 @@ class Schedule:
                 print(f"[Задача запущена] День {day} | время {h:02d}:{m:02d}")
 
                 task = asyncio.create_task(self.job())
-                task.add_done_callback(lambda t: print(f"Задача выполнена: {t.exception()}"))
+                task.add_done_callback(lambda t: print(f"Результат выполнения задачи: {t.exception()}"))
 
             # шаг на 1 виртуальную минуту
             virtual_minutes += 1
@@ -39,7 +39,7 @@ class Schedule:
             # ждём до момента "следующей виртуальной минуты"
             sleep_time = (next_tick - datetime.now()).total_seconds()
             if sleep_time > 0:
-                time.sleep(sleep_time)
+                await asyncio.sleep(sleep_time)
 
     # запуск общего цикла
     async def run(self):

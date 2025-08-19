@@ -38,6 +38,5 @@ class DraftBot:
             await self.client.send_message(
                 to_chat_id,
                 post.text,
-                buttons=post.buttons,
-                entities=post.entities
+                buttons=post.buttons
             )
