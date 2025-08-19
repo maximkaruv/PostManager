@@ -1,7 +1,6 @@
-from telethon.tl.types import Message, MessageService, MessageMediaPoll
+from telethon.tl.types import MessageService, MessageMediaPoll
 
-
-class DraftsBot:
+class DraftBot:
     def __init__(self, client, drafts_chat_id):
         self.client = client
         self.drafts_chat_id = drafts_chat_id
