@@ -1,12 +1,13 @@
-import time
 from datetime import datetime, timedelta
 import asyncio
 
 class Schedule:
-    def __init__(self, timetable, job, time_scale = 1):
+    def __init__(self, title, timetable, job, time_scale, logger):
+        self.title = title
         self.job = job
         self.time_scale = time_scale
-        print(f"Инициализировано расписание: {timetable}")
+        self.logger = logger
+        self.logger.success(f"{self.title} | Расписание | {timetable}")
         self.schedule_minutes = [self.parse_time(t) for t in timetable]
 
     # переводим расписание в минуты с начала суток
@@ -27,10 +28,10 @@ class Schedule:
             # входит ли текущая минута в расписание
             if virtual_minutes in self.schedule_minutes:
                 h, m = divmod(virtual_minutes, 60)
-                print(f"[Задача запущена] День {day} | время {h:02d}:{m:02d}")
+                self.logger.info(f"{self.title} | Расписание | Задача запущена | {h:02d}:{m:02d}")
 
-                task = asyncio.create_task(self.job())
-                task.add_done_callback(lambda t: print(f"Результат выполнения задачи: {t.exception()}"))
+                task = asyncio.create_task(self.job(time=f"{h:02d}:{m:02d}"))
+                task.add_done_callback(lambda t: self.logger.info(f"{self.title} | Расписание | Результат выполнения задачи: {t.exception()}"))
 
             # шаг на 1 виртуальную минуту
             virtual_minutes += 1
@@ -45,7 +46,6 @@ class Schedule:
     async def run(self):
         day = 1
         while True:
-            print(f"\n=== Начало виртуального дня {day} ===")
+            self.logger.info(f"{self.title} | Расписание | Начался {day} день")
             await self.run_day(day)
             day += 1
-
