@@ -7,7 +7,7 @@ class Schedule:
         self.job = job
         self.time_scale = time_scale
         self.logger = logger
-        self.logger.success(f"{self.title} | Расписание | {timetable}")
+        self.logger.info(f"{self.title} | Расписание | {timetable}")
         self.schedule_minutes = [self.parse_time(t) for t in timetable]
 
     # переводим расписание в минуты с начала суток

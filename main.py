@@ -9,18 +9,19 @@ import random
 with open('config.yaml', 'r', encoding='utf-8') as config_file:
     config = yaml.safe_load(config_file)
 
-setlogger('main.log')
+setlogger('logs/main.log')
 
 class Bundle:
-    def __init__(self, title, draft_chat, original_chat, timetable, client):
+    def __init__(self, title, draft_chat, original_chat, timetable, time_scale, client):
         self.title = title
         self.draft_chat = draft_chat
         self.original_chat = original_chat
         self.timetable = timetable
+        self.time_scale = time_scale
         self.draftbot = DraftBot(client, self.draft_chat)
         self.history = History(title)
         self.group = []
-    
+
     # Получаем все ранее неопубликованные черновые посты и формируем группу
     async def update_drafts_in_group(self):
         logger.info(f"{self.title} | ~1) Попытка получить черновые посты")
@@ -67,7 +68,7 @@ class Bundle:
             title=self.title,
             timetable=self.timetable,
             job=self.public_post,
-            time_scale=3600,
+            time_scale=self.time_scale,
             logger=logger,
         )
         logger.success(f"{self.title} | Расписание запущено")
@@ -88,24 +89,9 @@ async def main():
             draft_chat=bot['draft_chat'],
             original_chat=bot['original_chat'],
             timetable=bot['timetable'],
+            time_scale=config['time_scale'],
             client=client
         ))
-
-    # draftbot1 = Bundle(
-    #     title="Черновик 1",
-    #     draft_chat="https://t.me/draft_group",
-    #     original_chat="https://t.me/original_group2",
-    #     timetable=["3:00", "7:00", "22:00"],
-    #     client=client
-    # )
-    # draftbot2 = Bundle(
-    #     title="Черновик 2",
-    #     draft_chat="https://t.me/draft_group_2",
-    #     original_chat="https://t.me/original_group2",
-    #     timetable=["16:00"],
-    #     client=client
-    # )
-    # bundles = [draftbot1, draftbot2]
 
     await asyncio.gather(*(b.run_schedule() for b in bundles))
 
