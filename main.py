@@ -1,10 +1,13 @@
-from config import api_id, api_hash, session_name
+import yaml
 from telethon import TelegramClient
 from modules.draftsbot import DraftBot
 from modules.schedule import Schedule
 from modules.history import History
 from modules.logging import setlogger, logger
 import random
+
+with open('config.yaml', 'r', encoding='utf-8') as config_file:
+    config = yaml.safe_load(config_file)
 
 setlogger('main.log')
 history = History()
@@ -72,17 +75,36 @@ class Bundle:
 
 # Запускаем юзербота и все связки "черновик-осн.канал"
 async def main():
-    client = TelegramClient(session_name, api_id, api_hash)
+    userbot = config['userbot']
+    client = TelegramClient(userbot['session_name'], userbot['api_id'], userbot['api_hash'])
     await client.start()
 
-    drafts = Bundle(
+    # bundles = []
+    # draftbots = config['draftbots']
+    # for bot in draftbots:
+    #     bundles.append(Bundle(
+    #         title=bot['title'],
+    #         draft_chat=bot['draft_chat'],
+    #         original_chat=bot['original_chat'],
+    #         timetable=bot['timetable'],
+    #         client=client
+    #     ))
+
+    draftbot1 = Bundle(
         title="Черновик 1",
         draft_chat="https://t.me/draft_group",
         original_chat="https://t.me/original_group2",
         timetable=["3:00", "7:00", "22:00"],
         client=client
     )
-    bundles = [drafts]
+    draftbot2 = Bundle(
+        title="Черновик 2",
+        draft_chat="https://t.me/draft_group_2",
+        original_chat="https://t.me/original_group2",
+        timetable=["16:00"],
+        client=client
+    )
+    bundles = [draftbot1, draftbot2]
 
     await asyncio.gather(*(b.run_schedule() for b in bundles))
 
