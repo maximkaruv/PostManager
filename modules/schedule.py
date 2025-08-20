@@ -17,7 +17,8 @@ class Schedule:
 
     # запуск расписания текущего дня
     async def run_day(self, day: int):
-        virtual_minutes = 0
+        now = datetime.now()
+        virtual_minutes = now.hour * 60 + now.minute
         end_of_day = 24 * 60
 
         # старт реального времени
