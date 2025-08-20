@@ -12,12 +12,13 @@ with open('config.yaml', 'r', encoding='utf-8') as config_file:
 setlogger('logs/main.log')
 
 class Bundle:
-    def __init__(self, title, draft_chat, original_chat, timetable, time_scale, client):
+    def __init__(self, title, draft_chat, original_chat, timetable, time_scale, random_choice, client):
         self.title = title
         self.draft_chat = draft_chat
         self.original_chat = original_chat
         self.timetable = timetable
         self.time_scale = time_scale
+        self.random_choice = random_choice
         self.draftbot = DraftBot(client, self.draft_chat)
         self.history = History(title)
         self.group = []
@@ -26,7 +27,7 @@ class Bundle:
     async def update_drafts_in_group(self):
         logger.info(f"{self.title} | ~1) Попытка получить черновые посты")
         last_posts = await self.draftbot.get_posts()
-        logger.info(f"{self.title} | ~2) Получен список постов ({len(last_posts)} шт)")
+        logger.success(f"{self.title} | ~2) Получен список постов ({len(last_posts)} шт)")
 
         if not last_posts:
             logger.warning(f"{self.title} | ~3) Не найдено черновых постов")
@@ -45,7 +46,7 @@ class Bundle:
             try:
                 await self.update_drafts_in_group()
             except Exception as e:
-                logger.error(f"{self.title} | 2) Не удалось получить НОВЫЕ черновые посты")
+                logger.error(f"{self.title} | 2) Не удалось получить НОВЫЕ черновые посты: {e}")
                 return
 
             if not self.group:
@@ -53,11 +54,14 @@ class Bundle:
                 return
 
         try:
-            random_post = random.choice(self.group)
-            self.group.remove(random_post)
-            await self.draftbot.duplicate_post(self.draft_chat, self.original_chat, random_post.id)
-            logger.success(f"{self.title} | 3) Опубликован новый пост в осн.канал: {random_post.id} | {time}")
-            self.history.add(random_post.id)
+            if self.random_choice:
+                next_post = random.choice(self.group)
+            else:
+                next_post = self.group[0]
+            self.group.remove(next_post)
+            await self.draftbot.duplicate_post(self.draft_chat, self.original_chat, next_post.id)
+            logger.success(f"{self.title} | 3) Опубликован новый пост в осн.канал: {next_post.id} | {time}")
+            self.history.add(next_post.id)
 
         except Exception as e:
             logger.error(f"{self.title} | 3) Не удалось опубликовать пост | {time} | {e}")
@@ -74,6 +78,7 @@ class Bundle:
         logger.success(f"{self.title} | Расписание запущено")
         await schedule.run()
 
+
 # Запускаем юзербота и все связки "черновик-осн.канал"
 async def main():
     userbot = config['userbot']
@@ -89,7 +94,8 @@ async def main():
             draft_chat=bot['draft_chat'],
             original_chat=bot['original_chat'],
             timetable=bot['timetable'],
-            time_scale=config['time_scale'],
+            time_scale=config.get('time_scale', 1),
+            random_choice=bot.get('time_scale', True),
             client=client
         ))
 
