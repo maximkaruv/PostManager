@@ -10,7 +10,6 @@ with open('config.yaml', 'r', encoding='utf-8') as config_file:
     config = yaml.safe_load(config_file)
 
 setlogger('main.log')
-history = History()
 
 class Bundle:
     def __init__(self, title, draft_chat, original_chat, timetable, client):
@@ -19,6 +18,7 @@ class Bundle:
         self.original_chat = original_chat
         self.timetable = timetable
         self.draftbot = DraftBot(client, self.draft_chat)
+        self.history = History(title)
         self.group = []
     
     # Получаем все ранее неопубликованные черновые посты и формируем группу
@@ -32,7 +32,7 @@ class Bundle:
             return []
         
         for post in last_posts:
-            if not history.has(post.id):
+            if not self.history.has(post.id):
                 self.group.append(post) # Добавляем черновой пост в группу
                 logger.info(f"{self.title} | ~3) В группу добавлен НОВЫЙ черновой пост: {post.id}")
     
@@ -56,7 +56,7 @@ class Bundle:
             self.group.remove(random_post)
             await self.draftbot.duplicate_post(self.draft_chat, self.original_chat, random_post.id)
             logger.success(f"{self.title} | 3) Опубликован новый пост в осн.канал: {random_post.id} | {time}")
-            history.add(random_post.id)
+            self.history.add(random_post.id)
 
         except Exception as e:
             logger.error(f"{self.title} | 3) Не удалось опубликовать пост | {time} | {e}")

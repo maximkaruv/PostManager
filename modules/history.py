@@ -1,12 +1,19 @@
+from pathlib import Path
 import json
 
 class History:
-    def __init__(self):
-        self.history_file = 'history.json'
+    def __init__(self, filename):
+        self.history_file = Path(f'histories/{filename}.json')
+        self.history_file.parent.mkdir(parents=True, exist_ok=True)
+        if not self.history_file.exists():
+            self.history_file.touch()
 
     def _get(self):
-        with open(self.history_file, 'r', encoding='utf-8') as file:
-            return json.load(file)
+        try:
+            with open(self.history_file, 'r', encoding='utf-8') as file:
+                return json.load(file)
+        except:
+            return []
 
     def add(self, id):
         history = self._get()

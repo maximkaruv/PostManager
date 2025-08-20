@@ -46,6 +46,6 @@ class Schedule:
     async def run(self):
         day = 1
         while True:
-            self.logger.info(f"{self.title} | Расписание | Начался {day} день")
+            self.logger.success(f"{self.title} | Расписание | Начался {day} день")
             await self.run_day(day)
             day += 1
