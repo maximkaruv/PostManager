@@ -79,32 +79,33 @@ async def main():
     client = TelegramClient(userbot['session_name'], userbot['api_id'], userbot['api_hash'])
     await client.start()
 
-    # bundles = []
-    # draftbots = config['draftbots']
-    # for bot in draftbots:
-    #     bundles.append(Bundle(
-    #         title=bot['title'],
-    #         draft_chat=bot['draft_chat'],
-    #         original_chat=bot['original_chat'],
-    #         timetable=bot['timetable'],
-    #         client=client
-    #     ))
+    bundles = []
+    draftbots = config['draftbots']
+    for bot in draftbots:
+        logger.info(f"Добавлен новый бандл: \"{bot['title']}\"")
+        bundles.append(Bundle(
+            title=bot['title'],
+            draft_chat=bot['draft_chat'],
+            original_chat=bot['original_chat'],
+            timetable=bot['timetable'],
+            client=client
+        ))
 
-    draftbot1 = Bundle(
-        title="Черновик 1",
-        draft_chat="https://t.me/draft_group",
-        original_chat="https://t.me/original_group2",
-        timetable=["3:00", "7:00", "22:00"],
-        client=client
-    )
-    draftbot2 = Bundle(
-        title="Черновик 2",
-        draft_chat="https://t.me/draft_group_2",
-        original_chat="https://t.me/original_group2",
-        timetable=["16:00"],
-        client=client
-    )
-    bundles = [draftbot1, draftbot2]
+    # draftbot1 = Bundle(
+    #     title="Черновик 1",
+    #     draft_chat="https://t.me/draft_group",
+    #     original_chat="https://t.me/original_group2",
+    #     timetable=["3:00", "7:00", "22:00"],
+    #     client=client
+    # )
+    # draftbot2 = Bundle(
+    #     title="Черновик 2",
+    #     draft_chat="https://t.me/draft_group_2",
+    #     original_chat="https://t.me/original_group2",
+    #     timetable=["16:00"],
+    #     client=client
+    # )
+    # bundles = [draftbot1, draftbot2]
 
     await asyncio.gather(*(b.run_schedule() for b in bundles))
 
